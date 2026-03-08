@@ -1,4 +1,4 @@
-use std::{ffi::CStr, path::{Path, PathBuf}};
+use std::{ffi::CStr, path::PathBuf};
 
 use widestring::{U16CString, Utf16Str, Utf16String};
 use windows::{
@@ -16,6 +16,8 @@ use windows::{
 };
 
 use crate::core::{utils::scale_to_aspect_ratio, Hachimi};
+use rust_i18n::t;
+use windows::Win32::UI::Input::KeyboardAndMouse::{self as km, VIRTUAL_KEY};
 
 use super::hachimi_impl::ResolutionScaling;
 
@@ -35,14 +37,18 @@ pub fn get_proc_address(hmodule: HMODULE, name: &CStr) -> usize {
     }
 }
 
-pub fn get_game_dir() -> Option<PathBuf> {
+pub fn get_exec_path() -> PathBuf {
     let mut slice = [0u16; MAX_PATH as usize];
-    let length = unsafe { GetModuleFileNameW(HMODULE::default(), &mut slice) } as usize;
+    let length = unsafe { GetModuleFileNameW(None, &mut slice) } as usize;
     let exec_path_str = unsafe { Utf16Str::from_slice_unchecked(&slice[..length]) }.to_string();
-    let exec_path = Path::new(&exec_path_str);
-    let parent = exec_path.parent()?;
 
-    Some(parent.to_owned())
+    PathBuf::from(exec_path_str)
+}
+
+pub fn get_game_dir() -> PathBuf {
+    let exec_path = get_exec_path();
+    let parent = exec_path.parent().unwrap();
+    parent.to_owned()
 }
 
 /*
@@ -108,7 +114,7 @@ pub fn get_scaling_res() -> Option<(i32, i32)> {
 
 pub unsafe fn set_window_topmost(hwnd: HWND, topmost: bool) -> Result<(), windows::core::Error> {
     let insert_after = if topmost { HWND_TOPMOST } else { HWND_NOTOPMOST };
-    SetWindowPos(hwnd, insert_after, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)
+    SetWindowPos(hwnd, Some(insert_after), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)
 }
 
 pub fn show_error(e: impl AsRef<str>) {
@@ -117,4 +123,93 @@ pub fn show_error(e: impl AsRef<str>) {
 
     let cstr = U16CString::from_str(s).unwrap();
     unsafe { MessageBoxW(None, PCWSTR(cstr.as_ptr()), w!("Hachimi Error"), MB_ICONERROR | MB_OK); }
+}
+
+pub fn vk_to_display_label(vk: u16) -> String {
+    if (0x41..=0x5A).contains(&vk) { // A-Z
+        return (vk as u8 as char).to_string();
+    }
+    if (0x30..=0x39).contains(&vk) { // 0-9
+        return (vk as u8 as char).to_string();
+    }
+
+    let code = VIRTUAL_KEY(vk).0;
+
+    // Function keys as a range
+    if code >= km::VK_F1.0 && code <= km::VK_F24.0 {
+        let n = (code - km::VK_F1.0) + 1;
+        return format!("F{}", n);
+    }
+
+    // Localized name mapping
+    let name_map: &[(u16, &str)] = &[
+        (km::VK_LEFT.0, "key_names.left"),
+        (km::VK_RIGHT.0, "key_names.right"),
+        (km::VK_UP.0, "key_names.up"),
+        (km::VK_DOWN.0, "key_names.down"),
+        (km::VK_INSERT.0, "key_names.insert"),
+        (km::VK_DELETE.0, "key_names.delete"),
+        (km::VK_HOME.0, "key_names.home"),
+        (km::VK_END.0, "key_names.end"),
+        (km::VK_PRIOR.0, "key_names.page_up"),
+        (km::VK_NEXT.0, "key_names.page_down"),
+        (km::VK_ESCAPE.0, "key_names.escape"),
+        (km::VK_BACK.0, "key_names.backspace"),
+        (km::VK_CLEAR.0, "key_names.clear"),
+        (km::VK_PAUSE.0, "key_names.pause"),
+        (km::VK_CAPITAL.0, "key_names.caps_lock"),
+        (km::VK_SCROLL.0, "key_names.scroll_lock"),
+        (km::VK_NUMLOCK.0, "key_names.num_lock"),
+        (km::VK_SNAPSHOT.0, "key_names.print_screen"),
+        (km::VK_LWIN.0, "key_names.left_win"),
+        (km::VK_RWIN.0, "key_names.right_win"),
+        (km::VK_APPS.0, "key_names.apps"),
+        (km::VK_MENU.0, "key_names.alt"),
+        (km::VK_CONTROL.0, "key_names.ctrl"),
+        (km::VK_SHIFT.0, "key_names.shift"),
+        (km::VK_TAB.0, "key_names.tab"),
+        (km::VK_RETURN.0, "key_names.enter"),
+        (km::VK_SPACE.0, "key_names.space"),
+        (km::VK_NUMPAD0.0, "key_names.numpad_0"),
+        (km::VK_NUMPAD1.0, "key_names.numpad_1"),
+        (km::VK_NUMPAD2.0, "key_names.numpad_2"),
+        (km::VK_NUMPAD3.0, "key_names.numpad_3"),
+        (km::VK_NUMPAD4.0, "key_names.numpad_4"),
+        (km::VK_NUMPAD5.0, "key_names.numpad_5"),
+        (km::VK_NUMPAD6.0, "key_names.numpad_6"),
+        (km::VK_NUMPAD7.0, "key_names.numpad_7"),
+        (km::VK_NUMPAD8.0, "key_names.numpad_8"),
+        (km::VK_NUMPAD9.0, "key_names.numpad_9"),
+        (km::VK_ADD.0, "key_names.numpad_add"),
+        (km::VK_SUBTRACT.0, "key_names.numpad_subtract"),
+        (km::VK_MULTIPLY.0, "key_names.numpad_multiply"),
+        (km::VK_DIVIDE.0, "key_names.numpad_divide"),
+        (km::VK_DECIMAL.0, "key_names.numpad_decimal"),
+    ];
+
+    if let Some((_, key)) = name_map.iter().find(|(k, _)| *k == code) {
+        return t!(*key).into_owned();
+    }
+
+    // OEM symbol mapping
+    let oem_map: &[(u16, &str)] = &[
+        (km::VK_OEM_1.0, ";"),
+        (km::VK_OEM_PLUS.0, "="),
+        (km::VK_OEM_COMMA.0, ","),
+        (km::VK_OEM_MINUS.0, "-"),
+        (km::VK_OEM_PERIOD.0, "."),
+        (km::VK_OEM_2.0, "/"),
+        (km::VK_OEM_3.0, "`"),
+        (km::VK_OEM_4.0, "["),
+        (km::VK_OEM_5.0, "\\"),
+        (km::VK_OEM_6.0, "]"),
+        (km::VK_OEM_7.0, "'"),
+        (km::VK_OEM_8.0, "OEM8"),
+        (km::VK_OEM_102.0, "<>"),
+    ];
+    if let Some((_, s)) = oem_map.iter().find(|(k, _)| *k == code) {
+        return (*s).to_owned();
+    }
+
+    format!("VK 0x{:02X}", vk)
 }

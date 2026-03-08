@@ -1,10 +1,10 @@
 <img align="left" width="80" height="80" src="assets/icon.png">
 
-# Hachimi
+# Hachimi Edge
 
 [English](README.md) | [简体中文](README-zh_cn.md) | 繁體中文
 
-[![Discord 伺服器](https://dcbadge.limes.pink/api/server/https://discord.gg/BVEt5FcxEn)](https://discord.gg/BVEt5FcxEn)
+[![Discord 伺服器](https://dcbadge.limes.pink/api/server/https://discord.gg/YjBgmuqqYr)](https://discord.gg/YjBgmuqqYr)
 
 馬姑娘:媠達比的遊戲強化與翻譯模組
 
@@ -31,7 +31,7 @@
 - **跨平台支援：** 可用於多平台，目前支援 Windows 與 Android。
 
 # 安裝方式
-請參閱 [快速開始指南](https://hachimi.leadrdrk.com/zh-tw/docs/hachimi/getting-started.html) 頁面。
+請參閱 [快速開始指南](https://hachimi.noccu.art/zh-tw/docs/hachimi/getting-started.html) 頁面。
 
 # 特別感謝
 以下這些專案是 Hachimi 開發的重要基礎，沒有他們的貢獻就沒有今天的 Hachimi：

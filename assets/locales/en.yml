@@ -1,13 +1,15 @@
-hachimi: "Hachimi"
+hachimi: "Hachimi Edge"
 
 windows:
   menu_open_key: "Right arrow"
 
 android:
-  menu_open_key: "Vol Up + Vol Down"
+  menu_open_key: "Vol Up + Vol Down\n\uf25a or Triple-tap top left"
 
 splash_sub: "\uf015 Press %{open_key_str} to open menu."
 loading_label: "Loading..."
+search_filter: "Type to search..."
+open: "Open"
 cancel: "Cancel"
 save: "Save"
 done: "Done"
@@ -21,6 +23,7 @@ default: "Default"
 off: "Off"
 on: "On"
 enable: "Enable"
+info: "Info"
 warning: "Warning"
 confirm_dialog_title: "Confirm"
 soft_restart_confirm_content: "Are you sure you want to soft restart the game?"
@@ -28,6 +31,7 @@ in_game_browser_confirm_content: "Are you sure you want to open the in-game brow
 browser_dialog_title: "Browser"
 
 menu:
+  check_for_updates: "\uf0aa Check for updates"
   fps_text: "FPS: %{fps}"
   close_menu: "\uf00d Close menu"
   stats_heading: "\uf022 Stats"
@@ -43,19 +47,21 @@ menu:
   stay_on_top: "Stay on top"
   translation_heading: "\uf02d Translation"
   reload_localized_data: "\uf021 Reload localized data"
-  check_for_updates: "\uf0aa Check for updates"
-  check_for_updates_pedantic: "\uf0aa Check for updates (pedantic)"
+  tl_check_for_updates: "\uf0aa Check for translation updates"
+  tl_check_for_updates_pedantic: "\uf0aa Check for translation updates (pedantic)"
   dump_localize_dict: "Dump localize dict"
   danger_zone_heading: "\uf071 Danger Zone"
   danger_zone_warning: "These options might have unintended effects on the game. Use with caution!"
   soft_restart: "\uf021 Soft restart"
   open_in_game_browser: "\uf0ac Open in-game browser"
   toggle_game_ui: "\uf06e Toggle game UI"
+  discord_rpc: "Discord RPC"
 
 notification:
   saved_localize_dump: "Saved to localize_dump.json"
   config_reloaded: "Config reloaded."
   config_saved: "Config saved."
+  config_error: "The config has been corrupted. Using defaults instead..."
   localized_data_reloaded: "Localized data reloaded."
   checking_for_tl_updates: "Checking for translation updates..."
   no_tl_updates: "No translation updates available."
@@ -64,6 +70,9 @@ notification:
   errors_during_update: "%{count} errors occurred during update. Check logs for more info."
   checking_for_updates: "Checking for updates..."
   no_updates: "No updates available."
+  press_to_set_menu_key: "Press a key in the game window to set the open-menu hotkey."
+  menu_open_key_set: "Open-menu hotkey set to %{key}"
+  ipc_softreset_exec: "IPC remote soft-reset executed"
 
 first_time_setup:
   title: "First Time Setup"
@@ -71,26 +80,41 @@ first_time_setup:
   welcome_content: >-
     Hachimi has been installed! This will guide you through the initial setup process.
     If you're not interested in using the translation features, you may skip it by closing this dialog.
+
+
+    DISCLAIMER: Hachimi is a community-driven project. All translations were made by various community contributors.
+    It is not developed or endorsed by Cygames, Inc., and violates the game's terms of service. By continuing,
+    you accept that you will be using it at your own risk.
   translation_repo_heading: "Translation repo"
   select_translation_repo: "Select a translation repo:"
+  no_compatible_repo: "No translation repos are compatible with this game version."
+  skip_translation: "Skip translations."
   complete_heading: "All done!"
   complete_content: >-
-    The translation repo has been set. Once you click on Done, the configuration will
-    be saved and an update check will be performed, which will prompt you to download the
-    new translation data.
+    Click on Done to save the configuration.
+    If you chose a translation repo, an update check will be performed,
+    which will prompt you to download the new translation data.
 
 about:
   title: "About"
-  copyright: "© 2024-2025 LeadRDRK and contributors"
+  copyright: "© 2024-%{year} LeadRDRK, kairusds and contributors"
   view_license: "View license"
-  check_for_updates: "Check for updates"
+  open_website: "Open website"
+  view_source_code: "View source code"
 
 license:
   title: "License"
+  gpl_v3_only_notice: "GPL-3.0-only License Text"
+  ofl_fonts_header: "This software bundles the following fonts under the SIL Open Font License 1.1:"
+  font_inter: "Inter: Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)"
+  font_font_awesome: "Font Awesome Version 4.7.0: Copyright Dave Gandy (https://fontawesome.com) 2016. All rights reserved."
+  ofl_notice: "SIL OFL 1.1 License Text"
+  font_alibaba_header: "Alibaba PuHuiTi 3.0"
+  font_alibaba_body: "Copyright (c) 2020-2023 Alibaba (China) Co., Ltd. All rights reserved."
 
 tl_updater:
   title: "Updating..."
-  warning: "Translations will not work\nwhile update is in progress"
+  warning: "Translations will not work while update is in progress"
 
 config_editor:
   title: "Config Editor"
@@ -98,51 +122,151 @@ config_editor:
   graphics_tab: "\uf03e Graphics"
   gameplay_tab: "\uf11b Gameplay"
   language: "Language"
+  restore_defaults: "Restore Defaults"
   disable_overlay: "Disable overlay (GUI)"
   disable_overlay_warning: >-
     This option will disable the Hachimi overlay after you restart the game,
     which means that you will NOT be able to access the Config Editor after this.
     If this was not intentional, close this dialog and DISABLE the option.
+  ipv4_only: "IPv4 ureq only"
+  meta_index_url: "Translations Meta URL"
   debug_mode: "Debug mode"
+  enable_file_logging: "Enable file logging"
+  apply_atlas_workaround: "Apply TL Atlas Workaround"
   translator_mode: "Translator mode"
   skip_first_time_setup: "Skip first time setup"
-  disable_auto_update_check: "Disable auto update\ncheck"
+  lazy_translation_updates: "Lazy translation updates"
+  disable_auto_update_check: "Disable auto update check"
   disable_translations: "Disable translations"
   enable_ipc: "Enable IPC"
   ipc_listen_all: "IPC listen all"
-  auto_translate_stories: "Auto translate\nstories"
-  auto_translate_ui: "Auto translate UI\n(MIGHT BREAK UIs)"
+  auto_translate_stories: "Auto translate stories"
+  auto_tl_warning: >-
+    Note: This feature will not work on its own; requires external setup.
+    Enabling this option requires a compatible translation server to be
+    installed on your computer or a cloud service exposing an API such as
+    py3translationServer or Sugoi Toolkit. Without a server running, no
+    additional translation will happen and gameplay may be affected.
+    Please leave this option disabled if you do not have a translation
+    server available.
+  auto_translate_ui: "Auto translate UI (MIGHT BREAK UIs)"
   target_fps: "Target FPS"
-  virtual_resolution_multiplier: "Virtual resolution\nmultiplier"
+  virtual_resolution_multiplier: "Virtual resolution multiplier"
   ui_scale: "UI scale"
+  gui_scale: "Overlay scale"
+  ui_animation_scale: "UI animation scale"
   graphics_quality: "Graphics quality"
   vsync: "VSync"
   auto_full_screen: "Auto full screen"
   full_screen_mode: "Full screen mode"
   full_screen_mode_exclusive: "Exclusive"
   full_screen_mode_borderless: "Borderless"
-  block_minimize_in_full_screen: "Block minimize in\nfull screen"
+  block_minimize_in_full_screen: "Block minimize in full screen"
   resolution_scaling: "Resolution scaling"
   resolution_scaling_default: "Default (1080p)"
   resolution_scaling_ssize: "Scale to screen size"
   resolution_scaling_wsize: "Scale to window size"
   window_always_on_top: "Window always on top"
-  story_choice_auto_select_delay: "Story choice auto\nselect delay"
-  story_text_speed_multiplier: "Story text speed\nmultiplier"
-  force_allow_dynamic_camera: "Force allow\ndynamic camera"
-  live_theater_allow_same_chara: "Live theater\nallow same chara"
-  physics_update_mode: "Physics update\nmode"
+  story_choice_auto_select_delay: "Story choice auto select delay"
+  story_text_speed_multiplier: "Story text speed multiplier"
+  force_allow_dynamic_camera: "Force allow dynamic camera"
+  live_theater_allow_same_chara: "Live theater allow same chara"
+  physics_update_mode: "Physics update mode"
+  disable_skill_name_translation: "Disable skill name translation"
+  hide_ingame_ui_hotkey: "Hide ingame UI hotkey"
+  hide_ingame_ui_hotkey_info: >-
+    This option allows a shortcut key to toggle the ingame UI.
+    For Android, you need to double tap the Volume Up key, or triple tap the top right of the screen.
+    For PC/Android with keyboard, it's the Insert key and can be configured in the gui or config.
+  discord_rpc: "Discord RPC"
+  menu_open_key: "Open menu hotkey"
+  menu_open_key_set: "Press to set"
+  msaa: "MSAA"
+  render_scale: "Render Scale"
+  aniso_level: "Anisotropic Filtering"
+  live_vocals_swap: "Live Vocals Swap"
+  live_vocals_swap_character_n: "Character %{index}"
+  skill_info_dialog: "Custom skill info dialog"
+  homescreen_bgseason: "Homescreen Background Season"
+  shadow_resolution: "Shadow Resolution"
+
+theme_editor:
+  title: "GUI Theme Editor"
+  ui_accent_color: "Accent Color"
+  ui_window_fill: "Window Background Color"
+  ui_panel_fill: "Panel Background Color"
+  ui_extreme_bg_color: "Input Background"
+  ui_text_color: "Text Color"
+  ui_window_rounding: "Rounded Corners"
 
 tl_update_dialog:
   title: "New update available"
   content: "A new translation update is available (%{size}). Do you want to download it?"
+  content_zip_warning: "A new translation update is available (%{changed_size}). This update will download the full archive (%{download_size}) instead."
 
 update_prompt_dialog:
   title: "New update available"
   content: |
     A new Hachimi update is available (%{version}). Do you want to install it?
     The game will be restarted in order to apply the update.
+  android_content: |
+    A new Hachimi Edge update is available (%{version}). Do you want to install it?
+
+    Tap "Yes" to open UmaPatcher Edge and re-patch your current game.
+    (No full game or APK re-download required, you only need to patch again like you normally would as UmaPatcher Edge always downloads the latest Hachimi Edge version.)
 
 updating_dialog:
   title: "Updating"
   content: "Downloading update, the game will restart shortly..."
+
+steam_overlay_conflict_dialog:
+  title: "Notice"
+  content: >-
+    Purchases might not work with the Hachimi overlay enabled. If the Steam overlay already showed
+    up for you to make a purchase, please ignore this message and press No. If it didn't work, press Yes
+    to temporarily disable the Hachimi overlay. It will close the game, and the next time the game starts up,
+    the Hachimi overlay will be disabled and you will be able to make a purchase. After that, you may restart
+    the game again to re-enable the Hachimi overlay.
+key_names:
+  left: "Left arrow"
+  right: "Right arrow"
+  up: "Up arrow"
+  down: "Down arrow"
+  insert: "Insert"
+  delete: "Delete"
+  home: "Home"
+  end: "End"
+  page_up: "Page Up"
+  page_down: "Page Down"
+  escape: "Escape"
+  tab: "Tab"
+  enter: "Enter"
+  space: "Space"
+  backspace: "Backspace"
+  clear: "Clear"
+  pause: "Pause"
+  caps_lock: "Caps Lock"
+  scroll_lock: "Scroll Lock"
+  num_lock: "Num Lock"
+  print_screen: "Print Screen"
+  left_win: "Left Windows"
+  right_win: "Right Windows"
+  apps: "Menu"
+  alt: "Alt"
+  ctrl: "Ctrl"
+  shift: "Shift"
+  numpad_0: "Numpad 0"
+  numpad_1: "Numpad 1"
+  numpad_2: "Numpad 2"
+  numpad_3: "Numpad 3"
+  numpad_4: "Numpad 4"
+  numpad_5: "Numpad 5"
+  numpad_6: "Numpad 6"
+  numpad_7: "Numpad 7"
+  numpad_8: "Numpad 8"
+  numpad_9: "Numpad 9"
+  numpad_add: "Numpad +"
+  numpad_subtract: "Numpad -"
+  numpad_multiply: "Numpad *"
+  numpad_divide: "Numpad /"
+  numpad_decimal: "Numpad ."

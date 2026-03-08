@@ -1,17 +1,22 @@
-#![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 
 macro_rules! new_hook {
     ($orig:ident, $hook:ident) => (
-        info!("new_hook!: {}", stringify!($hook));
-        if ($orig != 0) {
-            let res = crate::core::Hachimi::instance().interceptor.hook($orig as usize, $hook as usize);
-            if let Err(e) = res {
-                error!("{}", e);
+        let hachimi = crate::core::Hachimi::instance();
+        if !hachimi.config.load().disabled_hooks.contains(stringify!($hook)) {
+            info!("new_hook!: {}", stringify!($hook));
+            if ($orig != 0) {
+                let res = hachimi.interceptor.hook($orig as usize, $hook as *const () as usize);
+                if let Err(e) = res {
+                    error!("{}", e);
+                }
+            }
+            else {
+                error!("{} is null", stringify!($orig));
             }
         }
         else {
-            error!("{} is null", stringify!($orig));
+            info!("[DISABLED] new_hook!: {}", stringify!($hook));
         }
     )
 }
@@ -67,6 +72,7 @@ pub mod UnityEngine_CoreModule;
 pub mod UnityEngine_AssetBundleModule;
 pub mod UnityEngine_TextRenderingModule;
 pub mod UnityEngine_ImageConversionModule;
+pub mod Unity_RenderPipelines_Universal_Runtime;
 pub mod UnityEngine_UI;
 pub mod UnityEngine_UIModule;
 pub mod Unity_TextMeshPro;
@@ -77,6 +83,7 @@ pub mod umamusume;
 pub mod Cute_UI_Assembly;
 pub mod Plugins;
 mod Cute_Cri_Assembly;
+mod DOTween;
 
 #[cfg(target_os = "android")]
 mod Cute_Core_Assembly;
@@ -92,6 +99,7 @@ pub fn init() {
     UnityEngine_CoreModule::init();
     UnityEngine_TextRenderingModule::init();
     UnityEngine_ImageConversionModule::init();
+    Unity_RenderPipelines_Universal_Runtime::init();
     UnityEngine_UI::init();
     UnityEngine_UIModule::init();
     Unity_TextMeshPro::init();
@@ -103,6 +111,7 @@ pub fn init() {
     Cute_UI_Assembly::init();
     Plugins::init();
     Cute_Cri_Assembly::init();
+    DOTween::init();
 
     #[cfg(target_os = "android")]
     Cute_Core_Assembly::init();

@@ -1,19 +1,44 @@
-use std::path::PathBuf;
+use std::{fmt::Display, path::PathBuf};
+use serde::{Deserialize};
 
 use crate::game_impl;
 
 pub struct Game {
     pub package_name: String,
     pub region: Region,
-    pub data_dir: PathBuf
+    pub data_dir: PathBuf,
+
+    #[cfg(target_os = "windows")]
+    pub is_steam_release: bool
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Deserialize)]
 pub enum Region {
     Unknown,
     Japan,
     Taiwan,
-    Korea
+    Korea,
+    China,
+    Global
+}
+
+impl Display for Region {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Region::Unknown => "Unknown",
+            Region::Japan => "Japan",
+            Region::Taiwan => "Taiwan",
+            Region::Korea => "Korea",
+            Region::China => "China",
+            Region::Global => "Global"
+        })
+    }
+}
+
+impl Default for Region {
+    fn default() -> Self {
+        Region::Japan
+    }
 }
 
 impl Game {
@@ -22,14 +47,16 @@ impl Game {
         let region = game_impl::get_region(&package_name);
         let data_dir = game_impl::get_data_dir(&package_name);
 
-        if region == Region::Unknown {
-            warn!("Failed to detect game region")
-        }
+        #[cfg(target_os = "windows")]
+        let is_steam_release = game_impl::is_steam_release(&package_name);
 
         Game {
             package_name,
             region,
-            data_dir
+            data_dir,
+
+            #[cfg(target_os = "windows")]
+            is_steam_release
         }
     }
 }

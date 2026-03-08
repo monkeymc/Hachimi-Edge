@@ -1,4 +1,6 @@
 use std::fmt;
+#[cfg(target_os = "windows")]
+use windows::core::Error as WindowsError;
 
 #[derive(Debug)]
 pub enum Error {
@@ -15,6 +17,7 @@ pub enum Error {
     OutOfDiskSpace,
     FileHashMismatch(String),
     ZipError(zip::result::ZipError),
+    DiscordRpcError(String),
     RuntimeError(String)
 }
 
@@ -60,6 +63,9 @@ impl fmt::Display for Error {
             Error::ZipError(error) => {
                 write!(f, "Zip error: {}", error)
             },
+            Error::DiscordRpcError(msg) => {
+                write!(f, "Discord RPC Error: {}", msg)
+            },
             Error::RuntimeError(msg) => {
                 write!(f, "{}", msg)
             }
@@ -88,5 +94,12 @@ impl From<ureq::Error> for Error {
 impl From<zip::result::ZipError> for Error {
     fn from(e: zip::result::ZipError) -> Self {
         Error::ZipError(e)
+    }
+}
+
+#[cfg(target_os = "windows")]
+impl From<WindowsError> for Error {
+    fn from(e: WindowsError) -> Self {
+        Error::RuntimeError(e.to_string())
     }
 }
