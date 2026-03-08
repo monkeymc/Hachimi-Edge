@@ -12,11 +12,11 @@ static TIMEOUT: Lazy<Duration> = Lazy::new(|| {
 });
 // https://github.com/algesten/ureq/issues/707
 static AGENT: Lazy<ureq::Agent> = Lazy::new(|| {
-    ureq::AgentBuilder::new()
-        .timeout_connect(*TIMEOUT)
-        .timeout_read(*TIMEOUT)
-        .timeout_write(*TIMEOUT)
-        .build()
+    let config = ureq::config::Config::builder()
+        .timeout_connect(Some(*TIMEOUT))
+        .timeout_global(Some(*TIMEOUT))
+        .build();
+    ureq::Agent::new_with_config(config)
 });
 static REQUEST: Lazy<String> = Lazy::new(|| Hachimi::instance().config.load().notifier_host.clone() + "/notify/request");
 static RESPONSE: Lazy<String> = Lazy::new(|| Hachimi::instance().config.load().notifier_host.clone() + "/notify/response");
@@ -27,7 +27,7 @@ type DecompressResponseFn = extern "C" fn(data: *mut Il2CppArray) -> *mut Il2Cpp
 extern "C" fn CompressRequest(data: *mut Il2CppArray) -> *mut Il2CppArray {
     unsafe {
         let buffer = Array::<u8>::from(data);
-        let _ = AGENT.post(&REQUEST).send_bytes(&buffer.as_slice());
+        let _ = AGENT.post(REQUEST.as_str()).send(buffer.as_slice() as &[u8]);
     }
     get_orig_fn!(CompressRequest, CompressRequestFn)(data)
 }
@@ -35,7 +35,7 @@ extern "C" fn DecompressResponse(data: *mut Il2CppArray) -> *mut Il2CppArray {
     let decompressed = get_orig_fn!(DecompressResponse, DecompressResponseFn)(data);
     unsafe {
         let buffer = Array::<u8>::from(decompressed);
-        let _ = AGENT.post(&RESPONSE).send_bytes(&buffer.as_slice());
+        let _ = AGENT.post(RESPONSE.as_str()).send(buffer.as_slice() as &[u8]);
     }
     decompressed
 }
